@@ -886,19 +886,27 @@ renderCategories();
 render();
 document.getElementById("loader").style.display="none";
 }catch(err){
+}catch(err){
 
 console.error(err);
 
-}
+document.getElementById("loader").style.display="none";
 
+}
 }
 
 /* =========================
    LIVE SYNC
 ========================= */
+setInterval(()=>{
 
-setInterval(loadData,3000);
+if(currentUser){
 
+loadData();
+
+}
+
+},3000);
 /* =========================
    LOGIN
 ========================= */
@@ -955,9 +963,9 @@ localStorage.setItem(
 JSON.stringify(data.user)
 );
 
-updateUserUI();
+await loadData();
 
-loadData();
+updateUserUI();
 
 }else{
 
@@ -986,35 +994,136 @@ location.reload();
 /* =========================
    USER UI
 ========================= */
-
 function updateUserUI(){
+
+const loginModal =
+document.getElementById("loginModal");
+
+const userName =
+document.getElementById("userName");
+
+const userRole =
+document.getElementById("userRole");
+
+const addButton =
+document.querySelector(".floating");
+
+/* =========================
+   NOT LOGGED IN
+========================= */
 
 if(!currentUser){
 
-document
-.getElementById("loginModal")
-.classList.remove("show");
+loginModal.classList.add("show");
 
-document.body.style.overflow="auto";
+document.body.style.overflow="hidden";
+
+userName.innerText = "Guest";
+
+userRole.innerText =
+lang==="ar"
+?"زائر"
+:"Guest";
+
+/* Disable Add Button */
+
+if(addButton){
+
+addButton.style.opacity=".4";
+
+addButton.style.pointerEvents="none";
+
+}
 
 return;
 
 }
 
-document
-.getElementById("loginModal")
-.classList.remove("show");
+/* =========================
+   LOGGED IN
+========================= */
 
-document
-.getElementById("userName")
-.innerText=currentUser.name;
+loginModal.classList.remove("show");
 
-document
-.getElementById("userRole")
-.innerText=currentUser.role;
+document.body.style.overflow="auto";
+
+/* Enable Add Button */
+
+if(addButton){
+
+addButton.style.opacity="1";
+
+addButton.style.pointerEvents="auto";
 
 }
 
+/* USER INFO */
+
+userName.innerText =
+currentUser.name || "User";
+
+userRole.innerText =
+currentUser.role || "user";
+
+/* ROLE COLORS */
+
+if(currentUser.role==="admin"){
+
+userRole.style.color="#10b981";
+
+}else{
+
+userRole.style.color="#3b82f6";
+
+}
+
+/* OPTIONAL ROLE LABEL */
+
+if(lang==="ar"){
+
+if(currentUser.role==="admin"){
+
+userRole.innerText="مدير النظام";
+
+}else{
+
+userRole.innerText="مستخدم";
+
+}
+
+}else{
+
+if(currentUser.role==="admin"){
+
+userRole.innerText="Administrator";
+
+}else{
+
+userRole.innerText="User";
+
+}
+
+}
+
+/* SHOW/HIDE ADMIN FEATURES */
+
+document
+.querySelectorAll(".admin-only")
+.forEach(el=>{
+
+if(currentUser.role==="admin"){
+
+el.style.display="";
+
+}else{
+
+el.style.display="none";
+
+}
+
+});
+
+}
 /* =========================
    LANGUAGE
 ========================= */
