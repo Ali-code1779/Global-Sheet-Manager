@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Global Sheets Manager</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--bg:#081120;
+--bg2:#111827;
+--card:rgba(255,255,255,.05);
+--card-hover:rgba(255,255,255,.08);
+--border:rgba(255,255,255,.08);
+--text:#fff;
+--muted:rgba(255,255,255,.55);
+--blue:#3b82f6;
+--green:#10b981;
+--yellow:#f59e0b;
+--red:#ef4444;
+--sidebar:290px;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:
+radial-gradient(circle at top right,rgba(59,130,246,.15),transparent 30%),
+radial-gradient(circle at bottom left,rgba(16,185,129,.15),transparent 30%),
+linear-gradient(135deg,var(--bg),var(--bg2));
+color:#fff;
+min-height:100vh;
+font-family:'Inter',sans-serif;
+overflow-x:hidden;
+}
+
+body.rtl{
+direction:rtl;
+font-family:'Cairo',sans-serif;
+}
+
+::-webkit-scrollbar{
+width:7px;
+}
+
+::-webkit-scrollbar-thumb{
+background:rgba(255,255,255,.15);
+border-radius:999px;
+}
+
+.app{
+display:flex;
+min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:var(--sidebar);
+background:rgba(255,255,255,.04);
+backdrop-filter:blur(20px);
+border-left:1px solid rgba(255,255,255,.08);
+padding:24px;
+position:fixed;
+top:0;
+bottom:0;
+right:0;
+overflow-y:auto;
+z-index:100;
+}
+
+body.rtl .sidebar{
+right:auto;
+left:0;
+border-left:none;
+border-right:1px solid rgba(255,255,255,.08);
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:14px;
+margin-bottom:35px;
+}
+
+.logo-icon{
+width:60px;
+height:60px;
+border-radius:22px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:linear-gradient(135deg,#3b82f6,#2563eb);
+font-size:28px;
+}
+
+.logo h1{
+font-size:22px;
+font-weight:800;
+}
+
+.logo p{
+font-size:12px;
+color:var(--muted);
+margin-top:4px;
+}
+
+/* NAV */
+
+.nav{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.nav-btn{
+height:58px;
+border:none;
+border-radius:18px;
+background:transparent;
+color:#fff;
+display:flex;
+align-items:center;
+gap:14px;
+padding:0 18px;
+font-size:15px;
+cursor:pointer;
+transition:.3s;
+}
+
+.nav-btn:hover,
+.nav-btn.active{
+background:rgba(255,255,255,.08);
+}
+
+.nav-btn span{
+font-size:22px;
+}
+
+/* MAIN */
+
+.main{
+flex:1;
+padding:30px;
+margin-right:var(--sidebar);
+}
+
+body.rtl .main{
+margin-right:0;
+margin-left:var(--sidebar);
+}
+
+/* TOPBAR */
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:16px;
+margin-bottom:30px;
+flex-wrap:wrap;
+}
+
+.search{
+flex:1;
+position:relative;
+}
+
+.search input{
+width:100%;
+height:60px;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.08);
+border-radius:22px;
+padding:0 60px 0 20px;
+color:#fff;
+font-size:15px;
+outline:none;
+}
+
+.search-icon{
+position:absolute;
+top:50%;
+right:20px;
+transform:translateY(-50%);
+font-size:20px;
+opacity:.5;
+}
+
+.actions{
+display:flex;
+gap:12px;
+}
+
+.action-btn{
+width:58px;
+height:58px;
+border:none;
+border-radius:20px;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.08);
+cursor:pointer;
+font-size:21px;
+color:#fff;
+}
+
+/* STATS */
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:20px;
+margin-bottom:30px;
+}
+
+.stat{
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.08);
+border-radius:30px;
+padding:24px;
+backdrop-filter:blur(18px);
+}
+
+.stat-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.stat h2{
+font-size:34px;
+}
+
+.stat p{
+font-size:13px;
+color:var(--muted);
+margin-top:5px;
+}
+
+.stat-icon{
+width:60px;
+height:60px;
+border-radius:22px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:25px;
+}
+
+/* GRID */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+gap:24px;
+}
+
+/* CARD */
+
+.card{
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.08);
+border-radius:30px;
+padding:24px;
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+background:rgba(255,255,255,.08);
+}
+
+.card-top{
+display:flex;
+justify-content:space-between;
+margin-bottom:22px;
+}
+
+.card-icon{
+width:70px;
+height:70px;
+border-radius:24px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:32px;
+background:rgba(255,255,255,.08);
+}
+
+.favorite{
+font-size:24px;
+cursor:pointer;
+opacity:.35;
+}
+
+.favorite.active{
+opacity:1;
+color:#FFD700;
+}
+
+.card h3{
+font-size:18px;
+margin-bottom:10px;
+line-height:1.6;
+}
+
+.card p{
+font-size:13px;
+line-height:1.8;
+color:var(--muted);
+min-height:50px;
+}
+
+.tag{
+display:inline-flex;
+padding:8px 14px;
+border-radius:999px;
+font-size:11px;
+margin-top:16px;
+background:rgba(255,255,255,.08);
+}
+
+.card-footer{
+display:flex;
+gap:10px;
+margin-top:24px;
+}
+
+.open-btn{
+flex:1;
+height:50px;
+border:none;
+border-radius:18px;
+background:linear-gradient(135deg,#3b82f6,#2563eb);
+color:#fff;
+font-weight:700;
+cursor:pointer;
+}
+
+.edit-btn,
+.delete-btn{
+width:50px;
+border:none;
+border-radius:18px;
+background:rgba(255,255,255,.06);
+color:#fff;
+cursor:pointer;
+font-size:18px;
+}
+
+/* FLOATING */
+
+.floating{
+position:fixed;
+bottom:30px;
+left:30px;
+width:75px;
+height:75px;
+border:none;
+border-radius:28px;
+background:linear-gradient(135deg,#10b981,#059669);
+color:#fff;
+font-size:36px;
+cursor:pointer;
+z-index:500;
+}
+
+/* MODALS */
+
+.modal-overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.7);
+backdrop-filter:blur(12px);
+display:none;
+align-items:center;
+justify-content:center;
+padding:20px;
+z-index:999;
+}
+
+.modal-overlay.show{
+display:flex;
+}
+
+.modal{
+width:100%;
+max-width:520px;
+background:#111827;
+border-radius:32px;
+padding:30px;
+border:1px solid rgba(255,255,255,.08);
+}
+
+.modal h2{
+margin-bottom:25px;
+}
+
+.form-group{
+margin-bottom:18px;
+}
+
+.form-group label{
+display:block;
+margin-bottom:10px;
+font-size:13px;
+color:var(--muted);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select{
+width:100%;
+border:none;
+outline:none;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.08);
+border-radius:18px;
+padding:16px;
+color:#fff;
+font-size:14px;
+}
+
+textarea{
+resize:none;
+min-height:110px;
+}
+
+.modal-actions{
+display:flex;
+gap:12px;
+margin-top:24px;
+}
+
+.save-btn{
+flex:1;
+height:56px;
+border:none;
+border-radius:18px;
+background:linear-gradient(135deg,#10b981,#059669);
+color:#fff;
+font-weight:700;
+cursor:pointer;
+}
+
+.cancel-btn{
+width:130px;
+border:none;
+border-radius:18px;
+background:rgba(255,255,255,.06);
+color:#fff;
+cursor:pointer;
+}
+
+.empty{
+padding:80px 20px;
+text-align:center;
+color:var(--muted);
+}
+
+.empty div{
+font-size:90px;
+margin-bottom:20px;
+}
+
+@media(max-width:950px){
+
+.sidebar{
+transform:translateX(100%);
+transition:.4s;
+}
+
+body.rtl .sidebar{
+transform:translateX(-100%);
+}
+
+.sidebar.show{
+transform:translateX(0);
+}
+
+.main{
+margin-right:0!important;
+margin-left:0!important;
+}
+
+.grid{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN MODAL -->
+
+<div class="modal-overlay show" id="loginModal">
+
+<div class="modal">
+
+<h2 id="loginTitle">
+Login
+</h2>
+
+<div class="form-group">
+
+<label>
+Email
+</label>
+
+<input type="email" id="loginEmail">
+
+</div>
+
+<div class="form-group">
+
+<label>
+Password
+</label>
+
+<input type="password" id="loginPassword">
+
+</div>
+
+<div class="modal-actions">
+
+<button class="save-btn" onclick="login()">
+Login
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="loader"
+style="
+position:fixed;
+inset:0;
+background:#081120;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:99999;
+font-size:26px;
+font-weight:700;
+">
+⚡ Loading...
+</div>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar" id="sidebar">
+
+<div class="logo">
+
+<div class="logo-icon">
+🌍
+</div>
+
+<div>
+<h1>Global Sheets</h1>
+<p>Google Sheets Cloud Sync</p>
+</div>
+
+</div>
+
+<div class="nav" id="navContainer"></div>
+
+</aside>
+
+<!-- MAIN -->
+
+<main class="main">
+
+<div class="topbar">
+
+<div id="userInfo"
+style="
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:20px;
+padding:14px 18px;
+border-radius:18px;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.08);
+">
+
+<div style="
+width:45px;
+height:45px;
+border-radius:14px;
+background:#3b82f6;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+">
+👤
+</div>
+
+<div>
+
+<div id="userName">
+Guest
+</div>
+
+<div id="userRole"
+style="
+font-size:12px;
+opacity:.6;
+">
+User
+</div>
+
+</div>
+
+</div>
+
+<div class="search">
+
+<span class="search-icon">🔍</span>
+
+<input type="text" id="searchInput" placeholder="Search">
+
+</div>
+
+<div class="actions">
+
+<button class="action-btn" onclick="toggleLanguage()">
+🌐
+</button>
+<button class="action-btn" onclick="logout()">
+🚪
+</button>
+
+<button class="action-btn" onclick="exportJSON()">
+📤
+</button>
+
+</div>
+
+</div>
+
+<!-- STATS -->
+
+<div class="stats">
+
+<div class="stat">
+
+<div class="stat-top">
+
+<div>
+
+<h2 id="totalSheets">0</h2>
+
+<p>Total Sheets</p>
+
+</div>
+
+<div class="stat-icon" style="background:rgba(59,130,246,.2)">
+📄
+</div>
+
+</div>
+
+</div>
+
+<div class="stat">
+
+<div class="stat-top">
+
+<div>
+
+<h2 id="favoritesCount">0</h2>
+
+<p>Favorites</p>
+
+</div>
+
+<div class="stat-icon" style="background:rgba(245,158,11,.2)">
+⭐
+</div>
+
+</div>
+
+</div>
+
+<div class="stat">
+
+<div class="stat-top">
+
+<div>
+
+<h2 id="categoriesCount">0</h2>
+
+<p>Categories</p>
+
+</div>
+
+<div class="stat-icon" style="background:rgba(16,185,129,.2)">
+📂
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="grid" id="grid"></div>
+
+</main>
+
+</div>
+
+<!-- FLOATING -->
+
+<button class="floating" onclick="openModal()">
++
+</button>
+
+<!-- SHEET MODAL -->
+
+<div class="modal-overlay" id="modal">
+
+<div class="modal">
+
+<h2>Add Sheet</h2>
+
+<div class="form-group">
+<label>Name</label>
+<input type="text" id="nameInput">
+</div>
+
+<div class="form-group">
+<label>URL</label>
+<input type="text" id="urlInput">
+</div>
+
+<div class="form-group">
+<label>Description</label>
+<textarea id="descInput"></textarea>
+</div>
+
+<div class="form-group">
+<label>Category</label>
+<select id="categoryInput"></select>
+</div>
+
+<div class="form-group">
+<label>Icon</label>
+<input type="text" id="iconInput" placeholder="📄">
+</div>
+
+<div class="modal-actions">
+
+<button class="save-btn" onclick="saveSheet()">
+Save
+</button>
+
+<button class="cancel-btn" onclick="closeModal()">
+Cancel
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- CATEGORY MODAL -->
+
+<div class="modal-overlay" id="categoryModal">
+
+<div class="modal">
+
+<h2>Add Category</h2>
+
+<div class="form-group">
+<label>Category Name EN</label>
+<input type="text" id="categoryNameEnInput">
+</div>
+
+<div class="form-group">
+<label>Category Name AR</label>
+<input type="text" id="categoryNameArInput">
+</div>
+
+<div class="form-group">
+<label>Category Icon</label>
+<input type="text" id="categoryIconInput" placeholder="📂">
+</div>
+
+<div class="modal-actions">
+
+<button class="save-btn" onclick="saveCategory()">
+Save
+</button>
+
+<button class="cancel-btn" onclick="closeCategoryModal()">
+Cancel
+</button>
+
+</div>
+
+</div>
+
+</div>
+<script>
+
+/* =========================
+   API
+========================= */
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbyvfNIRzfMgSvl9CcpofrLRqLRQH5FDphbd6GWzGfwjvONqeQdyJSTX1AH8KDK4tGBv0g/exec";
+
+/* =========================
+   DATA
+========================= */
+
+let lang =
+localStorage.getItem("lang") || "en";
+
+let sheets = [];
+
+let categories = [];
+
+let users = [];
+
+let settings = {};
+
+let filter = "all";
+
+let editingId = null;
+
+let currentUser =
+JSON.parse(localStorage.getItem("currentUser"));
+window.addEventListener("load",()=>{
+
+if(!currentUser){
+
+document.body.style.overflow="hidden";
+
+}
+
+});
+
+}
+/* =========================
+   LOAD DATA
+========================= */
+
+async function loadData(){
+
+try{
+
+const res = await fetch(API_URL);
+
+const data = await res.json();
+
+sheets = data.sheets || [];
+
+categories = data.categories || [];
+
+users = data.users || [];
+
+settings = data.settings || {};
+
+renderCategories();
+
+render();
+document.getElementById("loader").style.display="none";
+}catch(err){
+
+console.error(err);
+
+}
+
+}
+
+/* =========================
+   LIVE SYNC
+========================= */
+
+setInterval(loadData,3000);
+
+/* =========================
+   LOGIN
+========================= */
+
+window.login = async()=>{
+
+const email =
+document
+.getElementById("loginEmail")
+.value
+.trim();
+
+const password =
+document
+.getElementById("loginPassword")
+.value
+.trim();
+
+if(!email || !password){
+
+alert(
+lang==="ar"
+?"أكمل البيانات"
+:"Complete fields"
+);
+
+return;
+
+}
+
+const res = await fetch(API_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"login",
+
+email,
+password
+
+})
+
+});
+
+const data = await res.json();
+
+if(data.success){
+
+currentUser = data.user;
+
+localStorage.setItem(
+"currentUser",
+JSON.stringify(data.user)
+);
+
+updateUserUI();
+
+loadData();
+
+}else{
+
+alert(
+lang==="ar"
+?"بيانات غير صحيحة"
+:"Invalid Login"
+);
+
+}
+
+};
+
+/* =========================
+   LOGOUT
+========================= */
+
+window.logout = ()=>{
+
+localStorage.removeItem("currentUser");
+
+location.reload();
+
+};
+
+/* =========================
+   USER UI
+========================= */
+
+function updateUserUI(){
+
+if(!currentUser){
+
+document
+.getElementById("loginModal")
+.classList.remove("show");
+
+document.body.style.overflow="auto";
+
+return;
+
+}
+
+document
+.getElementById("loginModal")
+.classList.remove("show");
+
+document
+.getElementById("userName")
+.innerText=currentUser.name;
+
+document
+.getElementById("userRole")
+.innerText=currentUser.role;
+
+}
+
+/* =========================
+   LANGUAGE
+========================= */
+
+function applyLanguage(){
+
+if(lang==="ar"){
+
+document.body.classList.add("rtl");
+
+}else{
+
+document.body.classList.remove("rtl");
+
+}
+
+renderCategories();
+
+render();
+
+}
+
+window.toggleLanguage=()=>{
+
+lang = lang==="en" ? "ar" : "en";
+
+localStorage.setItem("lang",lang);
+
+applyLanguage();
+
+};
+
+/* =========================
+   HELPERS
+========================= */
+
+function normalize(str){
+
+return String(str || "")
+.toLowerCase()
+.replace(/[أإآ]/g,'ا')
+.replace(/ة/g,'ه')
+.replace(/ى/g,'ي');
+
+}
+
+function escapeHTML(str){
+
+const div=document.createElement("div");
+
+div.textContent=str;
+
+return div.innerHTML;
+
+}
+
+/* =========================
+   RENDER CATEGORIES
+========================= */
+
+function renderCategories(){
+
+const nav =
+document.getElementById("navContainer");
+
+let html=`
+
+<button class="nav-btn active"
+onclick="setFilter('all',this)">
+<span>🏠</span>
+<b>${lang==="ar"?"الكل":"All"}</b>
+</button>
+
+`;
+
+categories.forEach(cat=>{
+
+html+=`
+
+<button class="nav-btn"
+onclick="setFilter('${cat.id}',this)">
+<span>${cat.icon}</span>
+<b>
+${lang==="ar"
+?cat.nameAr
+:cat.nameEn}
+</b>
+</button>
+
+`;
+
+});
+
+html+=`
+
+<button class="nav-btn"
+onclick="setFilter('favorites',this)">
+<span>⭐</span>
+<b>
+${lang==="ar"
+?"المفضلة"
+:"Favorites"}
+</b>
+</button>
+
+`;
+
+if(currentUser?.role==="admin"){
+
+html+=`
+
+<button class="nav-btn"
+onclick="openCategoryModal()">
+<span>➕</span>
+<b>
+${lang==="ar"
+?"إضافة قسم"
+:"Add Category"}
+</b>
+</button>
+
+`;
+
+}
+
+nav.innerHTML=html;
+
+document
+.getElementById("categoriesCount")
+.innerText = categories.length;
+
+const select =
+document.getElementById("categoryInput");
+
+if(select){
+
+select.innerHTML =
+categories.map(cat=>`
+
+<option value="${cat.id}">
+${cat.icon}
+${lang==="ar"
+?cat.nameAr
+:cat.nameEn}
+</option>
+
+`).join("");
+
+}
+
+}
+
+/* =========================
+   RENDER
+========================= */
+
+function render(){
+
+let data=[...sheets];
+
+if(filter!=="all"){
+
+if(filter==="favorites"){
+
+data=data.filter(x=>x.favorite);
+
+}else{
+
+data=data.filter(
+x=>x.category===filter
+);
+
+}
+
+}
+
+const search = normalize(
+document.getElementById("searchInput").value
+);
+
+if(search){
+
+data=data.filter(item=>{
+
+return normalize(item.name)
+.includes(search)
+
+||
+
+normalize(item.description)
+.includes(search);
+
+});
+
+}
+
+document
+.getElementById("totalSheets")
+.innerText=sheets.length;
+
+document
+.getElementById("favoritesCount")
+.innerText=
+sheets.filter(x=>x.favorite).length;
+
+const grid =
+document.getElementById("grid");
+
+if(!data.length){
+
+grid.innerHTML=`
+
+<div class="empty">
+
+<div>📂</div>
+
+<h2>
+${lang==="ar"
+?"لا توجد بيانات"
+:"No Data"}
+</h2>
+
+</div>
+
+`;
+
+return;
+
+}
+
+grid.innerHTML=data.map(item=>`
+
+<div class="card">
+
+<div class="card-top">
+
+<div class="card-icon">
+${item.icon || "📄"}
+</div>
+
+<div
+class="favorite
+${item.favorite?"active":""}"
+onclick="toggleFavorite('${item.id}')"
+>
+⭐
+</div>
+
+</div>
+
+<h3>
+${escapeHTML(item.name)}
+</h3>
+
+<p>
+${escapeHTML(item.description || "")}
+</p>
+
+<div class="tag">
+${item.category}
+</div>
+
+<div class="card-footer">
+
+<button
+class="open-btn"
+onclick="window.open('${item.url}','_blank')"
+>
+${lang==="ar"?"فتح":"Open"}
+</button>
+
+<button
+class="edit-btn"
+onclick="editSheet('${item.id}')"
+>
+✏️
+</button>
+${
+currentUser &&
+currentUser.role==="admin"
+?`
+<button
+class="delete-btn"
+onclick="deleteSheet('${item.id}')">
+🗑️
+</button>
+`
+:""
+}
+
+</div>
+
+</div>
+
+`).join("");
+
+}
+
+/* =========================
+   SEARCH
+========================= */
+
+document
+.getElementById("searchInput")
+.addEventListener("input",render);
+
+/* =========================
+   FILTER
+========================= */
+
+window.setFilter=(cat,el)=>{
+
+filter=cat;
+
+document
+.querySelectorAll(".nav-btn")
+.forEach(btn=>
+btn.classList.remove("active")
+);
+
+el.classList.add("active");
+
+render();
+
+};
+
+/* =========================
+   MODALS
+========================= */
+
+window.openModal=()=>{
+
+if(!currentUser){
+
+alert(
+lang==="ar"
+?"يجب تسجيل الدخول"
+:"Login Required"
+);
+
+return;
+
+}
+
+document
+.getElementById("modal")
+.classList.add("show");
+
+};
+
+window.closeModal=()=>{
+
+document
+.getElementById("modal")
+.classList.remove("show");
+
+editingId=null;
+
+document.getElementById("nameInput").value="";
+document.getElementById("urlInput").value="";
+document.getElementById("descInput").value="";
+document.getElementById("iconInput").value="";
+
+};
+
+window.openCategoryModal=()=>{
+
+if(currentUser?.role!=="admin"){
+
+alert(
+lang==="ar"
+?"غير مصرح"
+:"Not Allowed"
+);
+
+return;
+
+}
+
+document
+.getElementById("categoryModal")
+.classList.add("show");
+
+};
+
+window.closeCategoryModal=()=>{
+
+document
+.getElementById("categoryModal")
+.classList.remove("show");
+
+};
+
+/* =========================
+   SAVE SHEET
+========================= */
+
+window.saveSheet=async()=>{
+
+const name =
+document.getElementById("nameInput")
+.value
+.trim();
+
+let url =
+document.getElementById("urlInput")
+.value
+.trim();
+
+const description =
+document.getElementById("descInput")
+.value
+.trim();
+
+const category =
+document.getElementById("categoryInput")
+.value;
+
+const icon =
+document.getElementById("iconInput")
+.value
+.trim();
+
+if(!name || !url){
+
+alert(
+lang==="ar"
+?"أكمل البيانات"
+:"Complete fields"
+);
+
+return;
+
+}
+
+if(!/^https?:\/\//i.test(url)){
+
+url="https://"+url;
+
+}
+
+await fetch(API_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:
+editingId
+?"updateSheet"
+:"addSheet",
+
+user:
+currentUser?.email || "unknown",
+
+id:
+editingId ||
+crypto.randomUUID(),
+
+name,
+description,
+url,
+category,
+icon
+
+})
+
+});
+
+closeModal();
+
+loadData();
+
+};
+
+/* =========================
+   DELETE
+========================= */
+
+window.deleteSheet=async(id)=>{
+
+if(currentUser?.role!=="admin"){
+
+alert(
+lang==="ar"
+?"غير مصرح"
+:"Not Allowed"
+);
+
+return;
+
+}
+
+if(!confirm(
+lang==="ar"
+?"هل تريد الحذف؟"
+:"Delete item?"
+)) return;
+
+await fetch(API_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"deleteSheet",
+
+user:
+currentUser?.email || "unknown",
+
+id
+
+})
+
+});
+
+loadData();
+
+};
+
+/* =========================
+   FAVORITE
+========================= */
+
+window.toggleFavorite=async(id)=>{
+
+await fetch(API_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"toggleFavorite",
+
+user:
+currentUser?.email || "unknown",
+
+id
+
+})
+
+});
+
+loadData();
+
+};
+
+/* =========================
+   EDIT
+========================= */
+
+window.editSheet=(id)=>{
+
+const item =
+sheets.find(x=>x.id===id);
+
+if(!item) return;
+
+editingId=id;
+
+document.getElementById("nameInput").value=item.name;
+document.getElementById("urlInput").value=item.url;
+document.getElementById("descInput").value=item.description;
+document.getElementById("categoryInput").value=item.category;
+document.getElementById("iconInput").value=item.icon;
+
+openModal();
+
+};
+
+/* =========================
+   SAVE CATEGORY
+========================= */
+
+window.saveCategory=async()=>{
+
+if(currentUser?.role!=="admin"){
+
+alert(
+lang==="ar"
+?"غير مصرح"
+:"Not Allowed"
+);
+
+return;
+
+}
+
+const nameEn =
+document
+.getElementById("categoryNameEnInput")
+.value
+.trim();
+
+const nameAr =
+document
+.getElementById("categoryNameArInput")
+.value
+.trim();
+
+const icon =
+document
+.getElementById("categoryIconInput")
+.value
+.trim() || "📂";
+
+if(!nameEn){
+
+alert(
+lang==="ar"
+?"أدخل القسم"
+:"Enter Category"
+);
+
+return;
+
+}
+
+await fetch(API_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"addCategory",
+
+user:
+currentUser?.email || "unknown",
+
+id:crypto.randomUUID(),
+
+nameEn,
+nameAr,
+icon
+
+})
+
+});
+
+closeCategoryModal();
+
+loadData();
+
+};
+
+/* =========================
+   EXPORT
+========================= */
+
+window.exportJSON=()=>{
+
+const data =
+JSON.stringify(sheets,null,2);
+
+const blob = new Blob([data],{
+
+type:"application/json"
+
+});
+
+const a =
+document.createElement("a");
+
+a.href=URL.createObjectURL(blob);
+
+a.download="backup.json";
+
+a.click();
+
+};
+
+/* =========================
+   CLOSE MODALS
+========================= */
+
+window.onclick=e=>{
+
+if(
+e.target===
+document.getElementById("modal")
+){
+
+closeModal();
+
+}
+
+if(
+e.target===
+document.getElementById("categoryModal")
+){
+
+closeCategoryModal();
+
+}
+
+};
+
+/* =========================
+   INIT
+========================= */
+
+applyLanguage();
+
+updateUserUI();
+
+loadData();
+
+</script>
+
+</body>
+</html>
