@@ -4,1568 +4,822 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Global Sheets Manager</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
 <style>
 
 :root {
-  --bg: #06090f;
-  --bg2: #0c1220;
-  --surface: rgba(255,255,255,.04);
-  --surface-hover: rgba(255,255,255,.08);
-  --border: rgba(255,255,255,.06);
-  --border-hover: rgba(255,255,255,.12);
-  --text: #e8ecf4;
-  --muted: rgba(255,255,255,.45);
+  --bg: #0b0f1a;
+  --sidebar-bg: #0e1326;
+  --text: #f0f2f8;
+  --muted: rgba(255,255,255,.5);
+  --border: rgba(255,255,255,.07);
   --accent: #6366f1;
-  --accent2: #818cf8;
-  --green: #34d399;
-  --green-dim: rgba(52,211,153,.15);
-  --yellow: #fbbf24;
-  --yellow-dim: rgba(251,191,36,.12);
-  --red: #f87171;
-  --red-dim: rgba(248,113,113,.12);
-  --sidebar-w: 280px;
-  --radius: 16px;
-  --radius-sm: 12px;
+  --green: #22c55e;
+  --sidebar-w: 240px;
   --font: 'DM Sans', sans-serif;
   --font-ar: 'Tajawal', sans-serif;
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-body.rtl {
-  direction: rtl;
-  font-family: var(--font-ar);
-}
-
-/* Background atmosphere */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 600px 400px at 10% 20%, rgba(99,102,241,.08), transparent),
-    radial-gradient(ellipse 500px 500px at 90% 80%, rgba(52,211,153,.06), transparent);
-  pointer-events: none;
-  z-index: 0;
-}
-
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; }
-
-/* ─── LOGIN SCREEN ─── */
-
-.login-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg);
-  opacity: 1;
-  transition: opacity .5s, visibility .5s;
-}
-
-.login-screen.hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.login-screen::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 50% 50% at 50% 40%, rgba(99,102,241,.12), transparent),
-    radial-gradient(ellipse 40% 60% at 30% 70%, rgba(52,211,153,.06), transparent);
-  pointer-events: none;
-}
-
-.login-box {
-  position: relative;
-  width: 420px;
-  max-width: 92vw;
-  padding: 48px 40px;
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--border);
-  border-radius: 28px;
-  backdrop-filter: blur(40px);
-  animation: loginIn .6s ease-out;
-}
-
-@keyframes loginIn {
-  from { opacity: 0; transform: translateY(30px) scale(.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.login-logo {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 36px;
-}
-
-.login-logo-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, var(--accent), #4f46e5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  box-shadow: 0 8px 32px rgba(99,102,241,.3);
-}
-
-.login-logo h1 {
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -.3px;
-}
-
-.login-logo p {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 3px;
-}
-
-.login-field {
-  margin-bottom: 18px;
-}
-
-.login-field label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: .8px;
-}
-
-.login-field input {
-  width: 100%;
-  height: 52px;
-  background: rgba(255,255,255,.04);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0 18px;
-  color: var(--text);
-  font-size: 15px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color .2s, background .2s;
-}
-
-.login-field input:focus {
-  border-color: var(--accent);
-  background: rgba(99,102,241,.04);
-}
-
-.login-btn {
-  width: 100%;
-  height: 54px;
-  margin-top: 8px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--accent), #4f46e5);
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  transition: transform .15s, box-shadow .2s;
-  box-shadow: 0 4px 24px rgba(99,102,241,.25);
-}
-
-.login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(99,102,241,.35); }
-.login-btn:active { transform: translateY(0); }
-
-.login-error {
-  margin-top: 14px;
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
-  background: var(--red-dim);
-  color: var(--red);
-  font-size: 13px;
-  font-weight: 500;
-  display: none;
-  animation: shake .4s;
-}
-
-@keyframes shake {
-  0%,100% { transform: translateX(0); }
-  20%,60% { transform: translateX(-6px); }
-  40%,80% { transform: translateX(6px); }
-}
-
-.login-error.show { display: block; }
-
-/* ─── LOADER ─── */
-
-#loader {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  gap: 12px;
-}
-
-.loader-spinner {
-  width: 28px;
-  height: 28px;
-  border: 3px solid rgba(255,255,255,.1);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ─── APP LAYOUT ─── */
-
-.app {
-  display: flex;
-  min-height: 100vh;
-  position: relative;
-  z-index: 1;
-}
-
-/* ─── SIDEBAR ─── */
-
-.sidebar {
-  width: var(--sidebar-w);
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  background: rgba(255,255,255,.02);
-  border-left: 1px solid var(--border);
-  padding: 28px 20px;
-  overflow-y: auto;
-  z-index: 100;
-  transition: transform .35s cubic-bezier(.4,0,.2,1);
-}
-
-body.rtl .sidebar {
-  right: auto;
-  left: 0;
-  border-left: none;
-  border-right: 1px solid var(--border);
-}
-
-.sidebar-logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 32px;
-  padding: 0 4px;
-}
-
-.sidebar-logo-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--accent), #4f46e5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  flex-shrink: 0;
-}
-
-.sidebar-logo h1 {
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -.3px;
-}
-
-.sidebar-logo p {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 2px;
-}
-
-/* NAV */
-
-.nav { display: flex; flex-direction: column; gap: 4px; }
-
-.nav-btn {
-  height: 48px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 14px;
-  font-size: 14px;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all .2s;
-  text-align: start;
-  white-space: nowrap;
-}
-
-body.rtl .nav-btn { text-align: right; }
-
-.nav-btn:hover { background: var(--surface-hover); color: var(--text); }
-
-.nav-btn.active {
-  background: rgba(99,102,241,.12);
-  color: var(--accent2);
-  font-weight: 600;
-}
-
-.nav-btn span { font-size: 18px; flex-shrink: 0; }
-
-.nav-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 12px 0;
-}
-
-/* ─── MAIN ─── */
-
-.main {
-  flex: 1;
-  padding: 28px 32px;
-  margin-right: var(--sidebar-w);
-  max-width: 100%;
-}
-
-body.rtl .main {
-  margin-right: 0;
-  margin-left: var(--sidebar-w);
-}
-
-/* ─── TOPBAR ─── */
-
-.topbar {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-}
-
-.user-badge {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
-.user-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), #4f46e5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff;
-}
-
-.user-name { font-size: 14px; font-weight: 600; }
-
-.user-role {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 1px;
-}
-
-.search-box {
-  flex: 1;
-  min-width: 200px;
-  position: relative;
-}
-
-.search-box input {
-  width: 100%;
-  height: 48px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0 16px 0 44px;
-  color: var(--text);
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color .2s;
-}
-
-body.rtl .search-box input { padding: 0 44px 0 16px; }
-
-.search-box input:focus { border-color: var(--accent); }
-
-.search-box .s-icon {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 16px;
-  opacity: .4;
-  pointer-events: none;
-}
-
-body.rtl .search-box .s-icon { left: auto; right: 15px; }
-
-.top-actions { display: flex; gap: 8px; }
-
-.top-btn {
-  width: 48px;
-  height: 48px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--text);
-  font-size: 18px;
-  cursor: pointer;
-  transition: all .2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.top-btn:hover { background: var(--surface-hover); border-color: var(--border-hover); }
-
-/* ─── STATS ─── */
-
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-bottom: 28px;
-}
-
-.stat-box {
-  padding: 20px 22px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.stat-box h2 {
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -.5px;
-}
-
-.stat-box p {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 3px;
-}
-
-.stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-/* ─── SECTION HEADER ─── */
-
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.section-header h2 {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--muted);
-  letter-spacing: -.2px;
-}
-
-/* ─── BUTTON LIST (replaces cards) ─── */
-
-.sheet-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.sheet-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 18px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all .2s;
-  position: relative;
-  overflow: hidden;
-}
-
-.sheet-row::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(99,102,241,.05), transparent);
-  opacity: 0;
-  transition: opacity .25s;
-}
-
-body.rtl .sheet-row::before {
-  background: linear-gradient(-90deg, rgba(99,102,241,.05), transparent);
-}
-
-.sheet-row:hover {
-  background: var(--surface-hover);
-  border-color: var(--border-hover);
-  transform: translateX(-3px);
-}
-
-body.rtl .sheet-row:hover { transform: translateX(3px); }
-
-.sheet-row:hover::before { opacity: 1; }
-
-.sheet-row .row-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(99,102,241,.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-}
-
-.sheet-row .row-info {
-  flex: 1;
-  min-width: 0;
-  position: relative;
-  z-index: 1;
-}
-
-.sheet-row .row-name {
-  font-size: 15px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sheet-row .row-desc {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sheet-row .row-cat {
-  padding: 5px 12px;
-  border-radius: 99px;
-  font-size: 11px;
-  font-weight: 600;
-  background: rgba(255,255,255,.06);
-  color: var(--muted);
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-}
-
-.sheet-row .row-actions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-}
-
-.row-action-btn {
-  width: 38px;
-  height: 38px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--text);
-  font-size: 15px;
-  cursor: pointer;
-  transition: all .15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.row-action-btn:hover { background: var(--surface-hover); }
-
-.row-action-btn.fav-btn { color: var(--muted); }
-.row-action-btn.fav-btn.active { color: var(--yellow); }
-
-.row-action-btn.open-btn-action {
-  background: linear-gradient(135deg, var(--accent), #4f46e5);
-  border-color: transparent;
-  color: #fff;
-  width: auto;
-  padding: 0 16px;
-  font-size: 12px;
-  font-weight: 700;
-  font-family: inherit;
-  gap: 5px;
-}
-
-.row-action-btn.open-btn-action:hover {
-  box-shadow: 0 4px 16px rgba(99,102,241,.3);
-}
-
-.row-action-btn.del-btn:hover { background: var(--red-dim); color: var(--red); }
-
-/* ─── EMPTY STATE ─── */
-
-.empty-state {
-  padding: 80px 20px;
-  text-align: center;
-  color: var(--muted);
-}
-
-.empty-state .empty-icon {
-  font-size: 64px;
-  margin-bottom: 16px;
-  opacity: .3;
-}
-
-.empty-state h3 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: var(--text);
-  opacity: .5;
-}
-
-/* ─── FLOATING ADD ─── */
-
-.fab {
-  position: fixed;
-  bottom: 28px;
-  left: 28px;
-  width: 60px;
-  height: 60px;
-  border: none;
-  border-radius: 20px;
-  background: linear-gradient(135deg, var(--green), #059669);
-  color: #fff;
-  font-size: 30px;
-  cursor: pointer;
-  z-index: 500;
-  box-shadow: 0 8px 32px rgba(52,211,153,.3);
-  transition: transform .15s, box-shadow .2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.fab:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 12px 40px rgba(52,211,153,.4); }
-
-/* ─── MODAL ─── */
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  backdrop-filter: blur(16px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 999;
-}
-
-.modal-overlay.show { display: flex; }
-
-.modal-box {
-  width: 100%;
-  max-width: 480px;
-  background: #111827;
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 32px;
-  animation: modalIn .3s ease-out;
-}
-
-@keyframes modalIn {
-  from { opacity: 0; transform: scale(.95) translateY(10px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.modal-box h2 {
-  font-size: 20px;
-  font-weight: 800;
-  margin-bottom: 24px;
-  letter-spacing: -.3px;
-}
-
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
-  margin-bottom: 7px;
-  text-transform: uppercase;
-  letter-spacing: .7px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  border: 1px solid var(--border);
-  outline: none;
-  background: rgba(255,255,255,.04);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  color: var(--text);
-  font-size: 14px;
-  font-family: inherit;
-  transition: border-color .2s;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  border-color: var(--accent);
-}
-
-.form-group textarea {
-  resize: none;
-  min-height: 90px;
-}
-
-.modal-btns {
-  display: flex;
-  gap: 10px;
-  margin-top: 22px;
-}
-
-.btn-save {
-  flex: 1;
-  height: 50px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--accent), #4f46e5);
-  color: #fff;
-  font-weight: 700;
-  font-size: 14px;
-  font-family: inherit;
-  cursor: pointer;
-  transition: transform .15s, box-shadow .2s;
-}
-
-.btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(99,102,241,.3); }
-
-.btn-cancel {
-  width: 120px;
-  height: 50px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--muted);
-  font-size: 14px;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all .2s;
-}
-
-.btn-cancel:hover { background: var(--surface-hover); color: var(--text); }
-
-/* ─── HAMBURGER ─── */
-
-.hamburger {
-  display: none;
-  width: 48px;
-  height: 48px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--text);
-  font-size: 20px;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ─── RESPONSIVE ─── */
-
-@media (max-width: 900px) {
-  .sidebar { transform: translateX(100%); }
-  body.rtl .sidebar { transform: translateX(-100%); }
-  .sidebar.show { transform: translateX(0); }
-  .main { margin-right: 0 !important; margin-left: 0 !important; padding: 20px 16px; }
-  .stats-row { grid-template-columns: 1fr; }
-  .hamburger { display: flex; }
-  .sheet-row .row-cat { display: none; }
-  .sheet-row .row-desc { display: none; }
-}
-
-/* ─── ANIMATIONS ─── */
-
-.sheet-row {
-  animation: rowIn .35s ease-out both;
-}
-
-@keyframes rowIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--font);min-height:100vh;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  user-select:none;
+}
+body.rtl{direction:rtl;font-family:var(--font-ar)}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:99px}
+
+/* ══════ LOGIN ══════ */
+.login-screen{
+  position:fixed;inset:0;z-index:10000;
+  display:flex;align-items:center;justify-content:center;
+  background:#070a14;transition:opacity .4s,visibility .4s;
+}
+.login-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.login-screen::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle 500px at 50% 35%,rgba(99,102,241,.1),transparent);
+}
+.login-box{
+  position:relative;width:380px;max-width:92vw;
+  padding:40px 32px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.08);border-radius:20px;
+  backdrop-filter:blur(30px);animation:fadeUp .5s ease-out;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.login-logo-icon{
+  width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,var(--accent),#4f46e5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;box-shadow:0 6px 20px rgba(99,102,241,.3);
+}
+.login-logo h1{font-size:18px;font-weight:800}
+.login-logo p{font-size:11px;color:var(--muted);margin-top:2px}
+
+.lf{margin-bottom:14px}
+.lf label{display:block;font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.7px}
+.lf input{
+  width:100%;height:48px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);border-radius:10px;
+  padding:0 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;transition:.2s;
+}
+.lf input:focus{border-color:var(--accent)}
+
+.login-btn{
+  width:100%;height:50px;margin-top:4px;border:none;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),#4f46e5);
+  color:#fff;font-size:14px;font-weight:700;font-family:inherit;
+  cursor:pointer;box-shadow:0 4px 18px rgba(99,102,241,.25);transition:.15s;
+}
+.login-btn:hover{transform:translateY(-1px)}
+
+.login-error{
+  margin-top:10px;padding:10px 12px;border-radius:8px;
+  background:rgba(239,68,68,.12);color:#f87171;
+  font-size:12px;font-weight:500;display:none;
+}
+.login-error.show{display:block;animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* ══════ LOADER ══════ */
+#loader{
+  position:fixed;inset:0;background:#070a14;
+  display:flex;align-items:center;justify-content:center;
+  z-index:9999;gap:8px;
+}
+.ld{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:ldB .5s infinite alternate}
+.ld:nth-child(2){animation-delay:.12s}.ld:nth-child(3){animation-delay:.24s}
+@keyframes ldB{to{transform:translateY(-10px);opacity:.3}}
+
+/* ══════ APP ══════ */
+.app{display:flex;min-height:100vh}
+
+/* ══════ SIDEBAR ══════ */
+.sidebar{
+  width:var(--sidebar-w);position:fixed;top:0;bottom:0;right:0;
+  background:var(--sidebar-bg);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;padding:20px 14px;
+  overflow-y:auto;z-index:100;transition:transform .3s ease;
+}
+body.rtl .sidebar{right:auto;left:0;border-left:none;border-right:1px solid var(--border)}
+
+.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:24px;padding:0 4px}
+.sb-logo-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),#4f46e5);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.sb-logo h1{font-size:14px;font-weight:800}
+.sb-logo p{font-size:9px;color:var(--muted)}
+
+.nav{display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-btn{
+  height:40px;border:none;border-radius:8px;background:transparent;
+  color:var(--muted);display:flex;align-items:center;gap:9px;
+  padding:0 10px;font-size:13px;font-weight:500;font-family:inherit;
+  cursor:pointer;transition:.15s;text-align:start;white-space:nowrap;
+}
+body.rtl .nav-btn{text-align:right}
+.nav-btn:hover{background:rgba(255,255,255,.05);color:#fff}
+.nav-btn.active{background:rgba(99,102,241,.14);color:#a5b4fc;font-weight:700}
+.nav-btn span{font-size:15px;width:20px;text-align:center}
+.nav-divider{height:1px;background:var(--border);margin:8px 0}
+
+/* ══════ MAIN ══════ */
+.main{flex:1;margin-right:var(--sidebar-w);display:flex;flex-direction:column}
+body.rtl .main{margin-right:0;margin-left:var(--sidebar-w)}
+
+/* HEADER */
+.hdr{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 20px;border-bottom:1px solid var(--border);
+  flex-shrink:0;flex-wrap:wrap;
+}
+.hamburger{
+  display:none;width:38px;height:38px;border:1px solid var(--border);
+  border-radius:8px;background:transparent;color:#fff;font-size:16px;
+  cursor:pointer;align-items:center;justify-content:center;
+}
+.u-pill{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 12px 6px 6px;border-radius:8px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+}
+.u-av{
+  width:30px;height:30px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),#4f46e5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;
+}
+.u-name{font-size:12px;font-weight:600}
+.u-role{font-size:9px;color:var(--muted)}
+
+.s-bar{flex:1;min-width:140px;position:relative}
+.s-bar input{
+  width:100%;height:38px;background:rgba(255,255,255,.04);
+  border:1px solid var(--border);border-radius:8px;
+  padding:0 12px 0 34px;color:#fff;font-size:12px;
+  font-family:inherit;outline:none;transition:.2s;
+}
+body.rtl .s-bar input{padding:0 34px 0 12px}
+.s-bar input:focus{border-color:var(--accent)}
+.s-bar .si{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;opacity:.35;pointer-events:none}
+body.rtl .s-bar .si{left:auto;right:11px}
+
+.h-actions{display:flex;gap:4px}
+.h-btn{
+  width:38px;height:38px;border:1px solid var(--border);border-radius:8px;
+  background:transparent;color:#fff;font-size:15px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:.15s;
+}
+.h-btn:hover{background:rgba(255,255,255,.06)}
+
+/* STATS */
+.stats-bar{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.st-cell{
+  flex:1;padding:12px 20px;display:flex;align-items:center;gap:10px;
+  border-right:1px solid var(--border);
+}
+body.rtl .st-cell{border-right:none;border-left:1px solid var(--border)}
+.st-cell:last-child{border:none}
+.st-cell h2{font-size:20px;font-weight:800}
+.st-cell p{font-size:10px;color:var(--muted)}
+.st-cell .sti{font-size:16px}
+
+.sec-lbl{padding:12px 20px 6px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+
+/* ═══════════════════════════════════════════════
+   ★★★ POS BUTTON GRID ★★★
+═══════════════════════════════════════════════ */
+.pos-wrap{flex:1;padding:12px 16px;overflow-y:auto}
+
+.pos-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+  gap:8px;
+}
+
+.pos-btn{
+  position:relative;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:6px;
+  padding:20px 10px 16px;
+  min-height:110px;
+  border:none;border-radius:12px;
+  outline:none;cursor:pointer;
+  font-family:inherit;text-align:center;color:#fff;
+  transition:transform .1s,filter .1s,box-shadow .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* glossy shine */
+.pos-btn::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:42%;
+  border-radius:12px 12px 0 0;
+  background:linear-gradient(180deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 100%);
+  pointer-events:none;
+}
+
+.pos-btn:hover{
+  transform:translateY(-3px) scale(1.03);
+  filter:brightness(1.15);
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  z-index:2;
+}
+.pos-btn:active{
+  transform:translateY(1px) scale(.96);
+  filter:brightness(.85);
+  transition-duration:.04s;
+  box-shadow:0 2px 6px rgba(0,0,0,.3);
+}
+
+.pos-btn .p-icon{
+  font-size:30px;position:relative;z-index:1;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.3));
+}
+.pos-btn .p-name{
+  font-size:12px;font-weight:700;line-height:1.3;
+  position:relative;z-index:1;
+  text-shadow:0 1px 3px rgba(0,0,0,.35);
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  word-break:break-word;
+}
+
+/* fav star */
+.pos-btn .p-star{
+  position:absolute;top:5px;left:5px;
+  font-size:12px;opacity:0;pointer-events:none;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.5));z-index:3;
+}
+body.rtl .pos-btn .p-star{left:auto;right:5px}
+.pos-btn .p-star.on{opacity:1}
+
+/* ═══ TOOLTIP (Description on hover) ═══ */
+.pos-btn .p-tooltip{
+  position:absolute;
+  bottom:calc(100% + 8px);
+  left:50%;transform:translateX(-50%);
+  background:#1e293b;
+  color:#e2e8f0;
+  font-size:11px;font-weight:500;
+  line-height:1.5;
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+  white-space:normal;
+  max-width:220px;
+  min-width:100px;
+  text-align:center;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .2s,transform .2s;
+  transform:translateX(-50%) translateY(4px);
+  z-index:50;
+  text-shadow:none;
+}
+/* arrow */
+.pos-btn .p-tooltip::after{
+  content:'';position:absolute;
+  top:100%;left:50%;transform:translateX(-50%);
+  border:6px solid transparent;
+  border-top-color:#1e293b;
+}
+
+.pos-btn:hover .p-tooltip{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* hide tooltip if empty */
+.pos-btn .p-tooltip:empty{display:none}
+
+/* ═══ CONTEXT MENU ═══ */
+.ctx-menu{
+  position:fixed;z-index:9000;min-width:200px;
+  background:#1a2036;border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;padding:6px 0;
+  box-shadow:0 12px 40px rgba(0,0,0,.5);
+  display:none;animation:ctxIn .12s ease-out;
+}
+.ctx-menu.show{display:block}
+@keyframes ctxIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+
+.ctx-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;font-size:13px;font-weight:500;
+  color:#d1d5db;cursor:pointer;transition:.1s;
+  border:none;background:none;width:100%;
+  font-family:inherit;text-align:start;
+}
+body.rtl .ctx-item{text-align:right}
+.ctx-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.ctx-item .ci{width:20px;text-align:center;font-size:15px}
+.ctx-sep{height:1px;background:rgba(255,255,255,.07);margin:4px 0}
+.ctx-item.danger{color:#f87171}
+.ctx-item.danger:hover{background:rgba(248,113,113,.1)}
+
+/* ══════ EMPTY ══════ */
+.empty-state{grid-column:1/-1;padding:60px 20px;text-align:center;color:var(--muted)}
+.empty-state .ei{font-size:48px;margin-bottom:10px;opacity:.2}
+.empty-state h3{font-size:15px;font-weight:600;opacity:.5;color:#fff}
+
+/* ══════ FAB ══════ */
+.fab{
+  position:fixed;bottom:20px;left:20px;
+  width:52px;height:52px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,var(--green),#16a34a);
+  color:#fff;font-size:26px;cursor:pointer;z-index:500;
+  box-shadow:0 6px 20px rgba(34,197,94,.3);
+  transition:.15s;display:flex;align-items:center;justify-content:center;
+}
+.fab:hover{transform:translateY(-2px) scale(1.06)}
+
+/* ══════ MODAL ══════ */
+.mo{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  backdrop-filter:blur(10px);
+  display:none;align-items:center;justify-content:center;
+  padding:20px;z-index:999;
+}
+.mo.show{display:flex}
+.mo-box{
+  width:100%;max-width:440px;background:#111827;
+  border:1px solid rgba(255,255,255,.08);border-radius:18px;
+  padding:26px;animation:moPop .2s ease-out;
+}
+@keyframes moPop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.mo-box h2{font-size:17px;font-weight:800;margin-bottom:18px}
+
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.6px}
+.fg input,.fg textarea,.fg select{
+  width:100%;border:1px solid rgba(255,255,255,.08);outline:none;
+  background:rgba(255,255,255,.04);border-radius:8px;
+  padding:11px 12px;color:#fff;font-size:13px;font-family:inherit;transition:.2s;
+}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--accent)}
+.fg textarea{resize:none;min-height:70px}
+
+.mo-foot{display:flex;gap:8px;margin-top:16px}
+.ms{
+  flex:1;height:44px;border:none;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),#4f46e5);
+  color:#fff;font-weight:700;font-size:13px;font-family:inherit;
+  cursor:pointer;transition:.15s;
+}
+.ms:hover{box-shadow:0 4px 14px rgba(99,102,241,.3)}
+.mc{
+  width:90px;height:44px;border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;background:transparent;color:var(--muted);
+  font-size:13px;font-family:inherit;cursor:pointer;transition:.15s;
+}
+.mc:hover{background:rgba(255,255,255,.05);color:#fff}
+
+/* ══════ RESPONSIVE ══════ */
+@media(max-width:900px){
+  .sidebar{transform:translateX(100%)}
+  body.rtl .sidebar{transform:translateX(-100%)}
+  .sidebar.show{transform:translateX(0)}
+  .main{margin-right:0!important;margin-left:0!important}
+  .hamburger{display:flex}
+  .stats-bar{flex-wrap:wrap}
+  .st-cell{border:none;border-bottom:1px solid var(--border)}
+  .pos-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px}
+  .pos-btn{min-height:95px;padding:16px 8px 12px}
+  .pos-btn .p-icon{font-size:24px}
+  .pos-btn .p-name{font-size:10px}
+  /* tooltip below on mobile */
+  .pos-btn .p-tooltip{bottom:auto;top:calc(100% + 8px)}
+  .pos-btn .p-tooltip::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:#1e293b}
+}
+@media(max-width:480px){
+  .pos-grid{grid-template-columns:repeat(3,1fr);gap:5px}
+  .pos-btn{min-height:85px;padding:14px 6px 10px}
+  .hdr{padding:10px 12px}
 }
 
 </style>
 </head>
 <body>
 
-<!-- ═══════ LOGIN SCREEN ═══════ -->
+<!-- LOGIN -->
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
       <div class="login-logo-icon">🌍</div>
-      <div>
-        <h1>Global Sheets</h1>
-        <p>Google Sheets Cloud Sync</p>
-      </div>
+      <div><h1>Global Sheets</h1><p>Google Sheets Cloud Sync</p></div>
     </div>
-    <div class="login-field">
-      <label id="lbl_email">EMAIL</label>
-      <input type="email" id="loginEmail" autocomplete="email">
-    </div>
-    <div class="login-field">
-      <label id="lbl_pass">PASSWORD</label>
-      <input type="password" id="loginPassword" autocomplete="current-password">
-    </div>
-    <button class="login-btn" id="loginBtn" onclick="login()">
-      <span id="loginBtnText">Sign In</span>
-    </button>
+    <div class="lf"><label id="lbl_email">EMAIL</label><input type="email" id="loginEmail" autocomplete="email"></div>
+    <div class="lf"><label id="lbl_pass">PASSWORD</label><input type="password" id="loginPassword" autocomplete="current-password"></div>
+    <button class="login-btn" id="loginBtn" onclick="login()"><span id="loginBtnText">Sign In</span></button>
     <div class="login-error" id="loginError"></div>
   </div>
 </div>
 
-<!-- ═══════ LOADER ═══════ -->
-<div id="loader">
-  <div class="loader-spinner"></div>
-  <span style="font-size:15px;font-weight:600;opacity:.6;">Loading…</span>
-</div>
+<div id="loader"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div>
 
-<!-- ═══════ APP ═══════ -->
 <div class="app">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="sidebar-logo-icon">🌍</div>
-      <div>
-        <h1>Global Sheets</h1>
-        <p>Cloud Sync</p>
-      </div>
-    </div>
+    <div class="sb-logo"><div class="sb-logo-icon">🌍</div><div><h1>Global Sheets</h1><p>Cloud Sync</p></div></div>
     <div class="nav" id="navContainer"></div>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
-
-    <!-- TOPBAR -->
-    <div class="topbar">
-
+    <div class="hdr">
       <button class="hamburger" onclick="toggleSidebar()">☰</button>
-
-      <div class="user-badge">
-        <div class="user-avatar" id="userAvatar">👤</div>
-        <div>
-          <div class="user-name" id="userName">Guest</div>
-          <div class="user-role" id="userRole">User</div>
-        </div>
+      <div class="u-pill">
+        <div class="u-av" id="userAvatar">👤</div>
+        <div><div class="u-name" id="userName">Guest</div><div class="u-role" id="userRole">User</div></div>
       </div>
-
-      <div class="search-box">
-        <span class="s-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="Search sheets…">
-      </div>
-
-      <div class="top-actions">
-        <button class="top-btn" onclick="toggleLanguage()" title="Language">🌐</button>
-        <button class="top-btn" onclick="exportJSON()" title="Export">📤</button>
-        <button class="top-btn" onclick="logout()" title="Logout">🚪</button>
+      <div class="s-bar"><span class="si">🔍</span><input type="text" id="searchInput" placeholder="Search…"></div>
+      <div class="h-actions">
+        <button class="h-btn" onclick="toggleLanguage()">🌐</button>
+        <button class="h-btn" onclick="exportJSON()">📤</button>
+        <button class="h-btn" onclick="logout()">🚪</button>
       </div>
     </div>
 
-    <!-- STATS -->
-    <div class="stats-row">
-      <div class="stat-box">
-        <div>
-          <h2 id="totalSheets">0</h2>
-          <p id="lbl_total">Total Sheets</p>
-        </div>
-        <div class="stat-icon" style="background:rgba(99,102,241,.12)">📄</div>
-      </div>
-      <div class="stat-box">
-        <div>
-          <h2 id="favoritesCount">0</h2>
-          <p id="lbl_fav">Favorites</p>
-        </div>
-        <div class="stat-icon" style="background:var(--yellow-dim)">⭐</div>
-      </div>
-      <div class="stat-box">
-        <div>
-          <h2 id="categoriesCount">0</h2>
-          <p id="lbl_cat">Categories</p>
-        </div>
-        <div class="stat-icon" style="background:var(--green-dim)">📂</div>
-      </div>
+    <div class="stats-bar">
+      <div class="st-cell"><span class="sti">📄</span><div><h2 id="totalSheets">0</h2><p id="lbl_total">Total</p></div></div>
+      <div class="st-cell"><span class="sti">⭐</span><div><h2 id="favoritesCount">0</h2><p id="lbl_fav">Favorites</p></div></div>
+      <div class="st-cell"><span class="sti">📂</span><div><h2 id="categoriesCount">0</h2><p id="lbl_cat">Categories</p></div></div>
     </div>
 
-    <!-- SECTION HEADER -->
-    <div class="section-header">
-      <h2 id="sectionTitle">All Sheets</h2>
-    </div>
-
-    <!-- SHEET LIST -->
-    <div class="sheet-list" id="grid"></div>
-
+    <div class="sec-lbl" id="sectionTitle">ALL SHEETS</div>
+    <div class="pos-wrap"><div class="pos-grid" id="grid"></div></div>
   </main>
 </div>
 
-<!-- FAB -->
+<!-- CONTEXT MENU (admin only) -->
+<div class="ctx-menu" id="ctxMenu">
+  <button class="ctx-item" id="ctxOpen"><span class="ci">🔗</span><span id="ctxOpenTxt">Open</span></button>
+  <div class="ctx-sep"></div>
+  <button class="ctx-item" id="ctxFav"><span class="ci" id="ctxFavIcon">☆</span><span id="ctxFavTxt">Favorite</span></button>
+  <button class="ctx-item" id="ctxEdit"><span class="ci">✏️</span><span id="ctxEditTxt">Edit</span></button>
+  <button class="ctx-item" id="ctxCopy"><span class="ci">📋</span><span id="ctxCopyTxt">Copy Link</span></button>
+  <div class="ctx-sep"></div>
+  <button class="ctx-item danger" id="ctxDel"><span class="ci">🗑</span><span id="ctxDelTxt">Delete</span></button>
+</div>
+
 <button class="fab" id="fabBtn" onclick="openModal()">+</button>
 
-<!-- ═══════ SHEET MODAL ═══════ -->
-<div class="modal-overlay" id="modal">
-  <div class="modal-box">
+<!-- SHEET MODAL -->
+<div class="mo" id="modal">
+  <div class="mo-box">
     <h2 id="modalTitle">Add Sheet</h2>
-    <div class="form-group">
-      <label id="lbl_name">Name</label>
-      <input type="text" id="nameInput">
-    </div>
-    <div class="form-group">
-      <label>URL</label>
-      <input type="text" id="urlInput" placeholder="https://docs.google.com/spreadsheets/...">
-    </div>
-    <div class="form-group">
-      <label id="lbl_desc">Description</label>
-      <textarea id="descInput"></textarea>
-    </div>
-    <div class="form-group">
-      <label id="lbl_category">Category</label>
-      <select id="categoryInput"></select>
-    </div>
-    <div class="form-group">
-      <label id="lbl_icon">Icon</label>
-      <input type="text" id="iconInput" placeholder="📄">
-    </div>
-    <div class="modal-btns">
-      <button class="btn-save" onclick="saveSheet()" id="saveSheetBtn">Save</button>
-      <button class="btn-cancel" onclick="closeModal()" id="cancelSheetBtn">Cancel</button>
+    <div class="fg"><label id="lbl_name">Name</label><input type="text" id="nameInput"></div>
+    <div class="fg"><label>URL</label><input type="text" id="urlInput" placeholder="https://docs.google.com/..."></div>
+    <div class="fg"><label id="lbl_desc">Description</label><textarea id="descInput"></textarea></div>
+    <div class="fg"><label id="lbl_category">Category</label><select id="categoryInput"></select></div>
+    <div class="fg"><label id="lbl_icon">Icon</label><input type="text" id="iconInput" placeholder="📄"></div>
+    <div class="mo-foot">
+      <button class="ms" onclick="saveSheet()" id="saveSheetBtn">Save</button>
+      <button class="mc" onclick="closeModal()" id="cancelSheetBtn">Cancel</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════ CATEGORY MODAL ═══════ -->
-<div class="modal-overlay" id="categoryModal">
-  <div class="modal-box">
+<!-- CATEGORY MODAL -->
+<div class="mo" id="categoryModal">
+  <div class="mo-box">
     <h2 id="catModalTitle">Add Category</h2>
-    <div class="form-group">
-      <label>Category Name (EN)</label>
-      <input type="text" id="categoryNameEnInput">
-    </div>
-    <div class="form-group">
-      <label>Category Name (AR)</label>
-      <input type="text" id="categoryNameArInput">
-    </div>
-    <div class="form-group">
-      <label>Icon</label>
-      <input type="text" id="categoryIconInput" placeholder="📂">
-    </div>
-    <div class="modal-btns">
-      <button class="btn-save" onclick="saveCategory()" id="saveCatBtn">Save</button>
-      <button class="btn-cancel" onclick="closeCategoryModal()" id="cancelCatBtn">Cancel</button>
+    <div class="fg"><label>Category Name (EN)</label><input type="text" id="categoryNameEnInput"></div>
+    <div class="fg"><label>Category Name (AR)</label><input type="text" id="categoryNameArInput"></div>
+    <div class="fg"><label>Icon</label><input type="text" id="categoryIconInput" placeholder="📂"></div>
+    <div class="mo-foot">
+      <button class="ms" onclick="saveCategory()" id="saveCatBtn">Save</button>
+      <button class="mc" onclick="closeCategoryModal()" id="cancelCatBtn">Cancel</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ═══════════════════════════════
-   API
-═══════════════════════════════ */
-const API_URL = "https://script.google.com/macros/s/AKfycbyvfNIRzfMgSvl9CcpofrLRqLRQH5FDphbd6GWzGfwjvONqeQdyJSTX1AH8KDK4tGBv0g/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbyvfNIRzfMgSvl9CcpofrLRqLRQH5FDphbd6GWzGfwjvONqeQdyJSTX1AH8KDK4tGBv0g/exec";
 
-/* ═══════════════════════════════
-   STATE
-═══════════════════════════════ */
-let lang = localStorage.getItem("lang") || "en";
-let sheets = [];
-let categories = [];
-let users = [];
-let settings = {};
-let filter = "all";
-let editingId = null;
-let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+const COLORS=[
+  '#2563eb','#7c3aed','#db2777','#dc2626','#ea580c',
+  '#d97706','#16a34a','#0d9488','#0284c7','#4f46e5',
+  '#9333ea','#e11d48','#c2410c','#ca8a04','#059669',
+  '#0891b2','#6366f1','#a855f7','#f43f5e','#f97316'
+];
 
-/* ═══════════════════════════════
-   INIT
-═══════════════════════════════ */
-window.addEventListener("load", () => {
-  applyLanguage();
-  updateUserUI();
-  if (currentUser) {
-    loadData();
-  } else {
-    document.getElementById("loader").style.display = "none";
-  }
+let lang=localStorage.getItem("lang")||"en";
+let sheets=[],categories=[],users=[],settings={};
+let filter="all",editingId=null;
+let currentUser=JSON.parse(localStorage.getItem("currentUser"));
+let ctxTargetId=null;
+
+window.addEventListener("load",()=>{
+  applyLanguage();updateUserUI();
+  if(currentUser) loadData();
+  else document.getElementById("loader").style.display="none";
 });
 
-/* ═══════════════════════════════
-   LOAD DATA
-═══════════════════════════════ */
-async function loadData() {
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    sheets = data.sheets || [];
-    categories = data.categories || [];
-    users = data.users || [];
-    settings = data.settings || {};
-    renderCategories();
-    render();
-    document.getElementById("loader").style.display = "none";
-  } catch (err) {
-    console.error(err);
-    document.getElementById("loader").style.display = "none";
+async function loadData(){
+  try{
+    const r=await fetch(API_URL),d=await r.json();
+    sheets=d.sheets||[];categories=d.categories||[];
+    users=d.users||[];settings=d.settings||{};
+    renderCategories();render();
+    document.getElementById("loader").style.display="none";
+  }catch(e){console.error(e);document.getElementById("loader").style.display="none"}
+}
+setInterval(()=>{if(currentUser) loadData()},3000);
+
+/* ══════ LOGIN ══════ */
+window.login=async()=>{
+  const em=document.getElementById("loginEmail").value.trim();
+  const pw=document.getElementById("loginPassword").value.trim();
+  const err=document.getElementById("loginError");
+  err.classList.remove("show");
+  if(!em||!pw){err.textContent=lang==="ar"?"أكمل الحقول":"Fill all fields";err.classList.add("show");return}
+  const btn=document.getElementById("loginBtn");btn.disabled=true;btn.style.opacity=".6";
+  try{
+    const r=await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"login",email:em,password:pw})});
+    const d=await r.json();
+    if(d.success){currentUser=d.user;localStorage.setItem("currentUser",JSON.stringify(d.user));updateUserUI();await loadData()}
+    else{err.textContent=lang==="ar"?"بيانات غير صحيحة":"Invalid credentials";err.classList.add("show")}
+  }catch(e){err.textContent=lang==="ar"?"خطأ بالاتصال":"Connection error";err.classList.add("show")}
+  btn.disabled=false;btn.style.opacity="1";
+};
+document.getElementById("loginPassword").addEventListener("keydown",e=>{if(e.key==="Enter") login()});
+window.logout=()=>{localStorage.removeItem("currentUser");location.reload()};
+
+function updateUserUI(){
+  const ls=document.getElementById("loginScreen"),fab=document.getElementById("fabBtn");
+  if(!currentUser){
+    ls.classList.remove("hidden");
+    document.getElementById("userName").innerText="Guest";
+    document.getElementById("userRole").innerText=lang==="ar"?"زائر":"Guest";
+    if(fab){fab.style.opacity=".3";fab.style.pointerEvents="none"}return;
   }
+  ls.classList.add("hidden");
+  if(fab){
+    // Only admin can add
+    if(currentUser.role==="admin"){fab.style.opacity="1";fab.style.pointerEvents="auto"}
+    else{fab.style.opacity=".3";fab.style.pointerEvents="none"}
+  }
+  document.getElementById("userName").innerText=currentUser.name||"User";
+  const rl=document.getElementById("userRole");
+  rl.innerText=currentUser.role==="admin"?(lang==="ar"?"مدير":"Admin"):(lang==="ar"?"مستخدم":"User");
+  rl.style.color=currentUser.role==="admin"?"#34d399":"#818cf8";
+  const av=document.getElementById("userAvatar");
+  if(currentUser.name){const p=currentUser.name.split(" ");av.textContent=p.length>1?(p[0][0]+p[1][0]).toUpperCase():p[0].substring(0,2).toUpperCase()}
 }
 
-/* LIVE SYNC */
-setInterval(() => {
-  if (currentUser) loadData();
-}, 3000);
+/* ══════ LANGUAGE ══════ */
+function applyLanguage(){
+  if(lang==="ar") document.body.classList.add("rtl");else document.body.classList.remove("rtl");
+  const t={
+    lbl_email:lang==="ar"?"البريد":"EMAIL",lbl_pass:lang==="ar"?"كلمة المرور":"PASSWORD",
+    loginBtnText:lang==="ar"?"دخول":"Sign In",
+    lbl_total:lang==="ar"?"الملفات":"Total",lbl_fav:lang==="ar"?"المفضلة":"Favorites",
+    lbl_cat:lang==="ar"?"الأقسام":"Categories",
+    lbl_name:lang==="ar"?"الاسم":"Name",lbl_desc:lang==="ar"?"الوصف":"Description",
+    lbl_category:lang==="ar"?"القسم":"Category",lbl_icon:lang==="ar"?"أيقونة":"Icon",
+  };
+  Object.entries(t).forEach(([id,v])=>{const el=document.getElementById(id);if(el) el.textContent=v});
+  document.getElementById("searchInput").placeholder=lang==="ar"?"بحث…":"Search…";
+  document.getElementById("saveSheetBtn").textContent=lang==="ar"?"حفظ":"Save";
+  document.getElementById("cancelSheetBtn").textContent=lang==="ar"?"إلغاء":"Cancel";
+  document.getElementById("saveCatBtn").textContent=lang==="ar"?"حفظ":"Save";
+  document.getElementById("cancelCatBtn").textContent=lang==="ar"?"إلغاء":"Cancel";
+  renderCategories();render();updateUserUI();
+}
+window.toggleLanguage=()=>{lang=lang==="en"?"ar":"en";localStorage.setItem("lang",lang);applyLanguage()};
 
-/* ═══════════════════════════════
-   LOGIN
-═══════════════════════════════ */
-window.login = async () => {
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value.trim();
-  const errorEl = document.getElementById("loginError");
+function normalize(s){return String(s||"").toLowerCase().replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي')}
+function escapeHTML(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
 
-  errorEl.classList.remove("show");
+function renderCategories(){
+  const nav=document.getElementById("navContainer");
+  let h=`<button class="nav-btn ${filter==='all'?'active':''}" onclick="setFilter('all',this)"><span>🏠</span><b>${lang==="ar"?"الكل":"All"}</b></button>`;
+  categories.forEach(c=>{h+=`<button class="nav-btn ${filter===c.id?'active':''}" onclick="setFilter('${c.id}',this)"><span>${c.icon}</span><b>${lang==="ar"?c.nameAr:c.nameEn}</b></button>`});
+  h+=`<button class="nav-btn ${filter==='favorites'?'active':''}" onclick="setFilter('favorites',this)"><span>⭐</span><b>${lang==="ar"?"المفضلة":"Favorites"}</b></button>`;
+  if(currentUser?.role==="admin") h+=`<div class="nav-divider"></div><button class="nav-btn" onclick="openCategoryModal()"><span>➕</span><b>${lang==="ar"?"إضافة قسم":"Add Category"}</b></button>`;
+  nav.innerHTML=h;
+  document.getElementById("categoriesCount").innerText=categories.length;
+  const sel=document.getElementById("categoryInput");
+  if(sel) sel.innerHTML=categories.map(c=>`<option value="${c.id}">${c.icon} ${lang==="ar"?c.nameAr:c.nameEn}</option>`).join("");
+}
 
-  if (!email || !password) {
-    errorEl.textContent = lang === "ar" ? "أكمل جميع الحقول" : "Please fill in all fields";
-    errorEl.classList.add("show");
+/* ═══════════════════════════════════════
+   ★★★ RENDER POS BUTTONS ★★★
+═══════════════════════════════════════ */
+function render(){
+  let data=[...sheets];
+  if(filter!=="all"){
+    if(filter==="favorites") data=data.filter(x=>x.favorite);
+    else data=data.filter(x=>x.category===filter);
+  }
+  const q=normalize(document.getElementById("searchInput").value);
+  if(q) data=data.filter(x=>normalize(x.name).includes(q)||normalize(x.description).includes(q));
+
+  document.getElementById("totalSheets").innerText=sheets.length;
+  document.getElementById("favoritesCount").innerText=sheets.filter(x=>x.favorite).length;
+
+  const st=document.getElementById("sectionTitle");
+  if(filter==="all") st.textContent=lang==="ar"?"جميع الملفات":"ALL SHEETS";
+  else if(filter==="favorites") st.textContent=lang==="ar"?"المفضلة":"FAVORITES";
+  else{const c=categories.find(x=>x.id===filter);st.textContent=c?(lang==="ar"?c.nameAr:c.nameEn):filter}
+
+  document.getElementById("modalTitle").textContent=editingId?(lang==="ar"?"تعديل":"Edit Sheet"):(lang==="ar"?"إضافة ملف":"Add Sheet");
+
+  const grid=document.getElementById("grid");
+  if(!data.length){
+    grid.innerHTML=`<div class="empty-state"><div class="ei">📂</div><h3>${lang==="ar"?"لا توجد بيانات":"No sheets"}</h3></div>`;
     return;
   }
 
-  const btn = document.getElementById("loginBtn");
-  btn.disabled = true;
-  btn.style.opacity = ".6";
+  const isAdmin=currentUser?.role==="admin";
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "login", email, password })
-    });
-    const data = await res.json();
-
-    if (data.success) {
-      currentUser = data.user;
-      localStorage.setItem("currentUser", JSON.stringify(data.user));
-      updateUserUI();
-      await loadData();
-    } else {
-      errorEl.textContent = lang === "ar" ? "بيانات الدخول غير صحيحة" : "Invalid email or password";
-      errorEl.classList.add("show");
-    }
-  } catch (e) {
-    errorEl.textContent = lang === "ar" ? "خطأ في الاتصال" : "Connection error";
-    errorEl.classList.add("show");
-  }
-
-  btn.disabled = false;
-  btn.style.opacity = "1";
-};
-
-/* Enter key */
-document.getElementById("loginPassword").addEventListener("keydown", e => {
-  if (e.key === "Enter") login();
-});
-
-/* ═══════════════════════════════
-   LOGOUT
-═══════════════════════════════ */
-window.logout = () => {
-  localStorage.removeItem("currentUser");
-  location.reload();
-};
-
-/* ═══════════════════════════════
-   USER UI
-═══════════════════════════════ */
-function updateUserUI() {
-  const loginScreen = document.getElementById("loginScreen");
-  const fab = document.getElementById("fabBtn");
-
-  if (!currentUser) {
-    loginScreen.classList.remove("hidden");
-    document.getElementById("userName").innerText = "Guest";
-    document.getElementById("userRole").innerText = lang === "ar" ? "زائر" : "Guest";
-    if (fab) { fab.style.opacity = ".3"; fab.style.pointerEvents = "none"; }
-    return;
-  }
-
-  loginScreen.classList.add("hidden");
-  if (fab) { fab.style.opacity = "1"; fab.style.pointerEvents = "auto"; }
-
-  document.getElementById("userName").innerText = currentUser.name || "User";
-
-  const roleEl = document.getElementById("userRole");
-  if (currentUser.role === "admin") {
-    roleEl.innerText = lang === "ar" ? "مدير النظام" : "Administrator";
-    roleEl.style.color = "var(--green)";
-  } else {
-    roleEl.innerText = lang === "ar" ? "مستخدم" : "User";
-    roleEl.style.color = "var(--accent2)";
-  }
-
-  // Avatar initials
-  const avatar = document.getElementById("userAvatar");
-  if (currentUser.name) {
-    const parts = currentUser.name.split(" ");
-    avatar.textContent = parts.length > 1
-      ? (parts[0][0] + parts[1][0]).toUpperCase()
-      : parts[0].substring(0, 2).toUpperCase();
-  }
-
-  document.querySelectorAll(".admin-only").forEach(el => {
-    el.style.display = currentUser.role === "admin" ? "" : "none";
-  });
+  grid.innerHTML=data.map((item,i)=>{
+    const bg=COLORS[i%COLORS.length];
+    const desc=escapeHTML(item.description||"");
+    return `
+    <button class="pos-btn" style="background:${bg}"
+            onclick="window.open('${item.url}','_blank')"
+            oncontextmenu="showCtx(event,'${item.id}')">
+      <div class="p-star ${item.favorite?'on':''}">⭐</div>
+      <div class="p-icon">${item.icon||'📄'}</div>
+      <div class="p-name">${escapeHTML(item.name)}</div>
+      ${desc?`<div class="p-tooltip">${desc}</div>`:''}
+    </button>`;
+  }).join("");
 }
 
-/* ═══════════════════════════════
-   LANGUAGE
-═══════════════════════════════ */
-function applyLanguage() {
-  if (lang === "ar") {
-    document.body.classList.add("rtl");
-  } else {
-    document.body.classList.remove("rtl");
-  }
+document.getElementById("searchInput").addEventListener("input",render);
+
+/* ═══════════════════════════════════════
+   ★ CONTEXT MENU — ADMIN ONLY
+═══════════════════════════════════════ */
+function showCtx(e,id){
+  e.preventDefault();
+  e.stopPropagation();
+
+  // ★ Only admin/manager sees context menu
+  if(currentUser?.role!=="admin") return;
+
+  ctxTargetId=id;
+  const item=sheets.find(x=>x.id===id);
+  if(!item) return;
+
+  const menu=document.getElementById("ctxMenu");
 
   // Labels
-  const t = {
-    lbl_email: lang === "ar" ? "البريد الإلكتروني" : "EMAIL",
-    lbl_pass: lang === "ar" ? "كلمة المرور" : "PASSWORD",
-    loginBtnText: lang === "ar" ? "تسجيل الدخول" : "Sign In",
-    lbl_total: lang === "ar" ? "إجمالي الملفات" : "Total Sheets",
-    lbl_fav: lang === "ar" ? "المفضلة" : "Favorites",
-    lbl_cat: lang === "ar" ? "الأقسام" : "Categories",
-    lbl_name: lang === "ar" ? "الاسم" : "Name",
-    lbl_desc: lang === "ar" ? "الوصف" : "Description",
-    lbl_category: lang === "ar" ? "القسم" : "Category",
-    lbl_icon: lang === "ar" ? "الأيقونة" : "Icon",
-  };
+  document.getElementById("ctxOpenTxt").textContent=lang==="ar"?"فتح الرابط":"Open Link";
+  document.getElementById("ctxEditTxt").textContent=lang==="ar"?"تعديل":"Edit";
+  document.getElementById("ctxCopyTxt").textContent=lang==="ar"?"نسخ الرابط":"Copy Link";
+  document.getElementById("ctxDelTxt").textContent=lang==="ar"?"حذف":"Delete";
 
-  Object.entries(t).forEach(([id, val]) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = val;
-  });
+  if(item.favorite){
+    document.getElementById("ctxFavIcon").textContent="★";
+    document.getElementById("ctxFavTxt").textContent=lang==="ar"?"إزالة من المفضلة":"Remove from Favorites";
+  }else{
+    document.getElementById("ctxFavIcon").textContent="☆";
+    document.getElementById("ctxFavTxt").textContent=lang==="ar"?"إضافة للمفضلة":"Add to Favorites";
+  }
 
-  document.getElementById("searchInput").placeholder = lang === "ar" ? "بحث…" : "Search sheets…";
-  document.getElementById("saveSheetBtn").textContent = lang === "ar" ? "حفظ" : "Save";
-  document.getElementById("cancelSheetBtn").textContent = lang === "ar" ? "إلغاء" : "Cancel";
-  document.getElementById("saveCatBtn").textContent = lang === "ar" ? "حفظ" : "Save";
-  document.getElementById("cancelCatBtn").textContent = lang === "ar" ? "إلغاء" : "Cancel";
-
-  renderCategories();
-  render();
+  // Position
+  let x=e.clientX,y=e.clientY;
+  menu.classList.add("show");
+  const mw=menu.offsetWidth,mh=menu.offsetHeight;
+  if(x+mw>window.innerWidth) x=window.innerWidth-mw-8;
+  if(y+mh>window.innerHeight) y=window.innerHeight-mh-8;
+  if(x<4) x=4; if(y<4) y=4;
+  menu.style.left=x+"px";menu.style.top=y+"px";
 }
 
-window.toggleLanguage = () => {
-  lang = lang === "en" ? "ar" : "en";
-  localStorage.setItem("lang", lang);
-  applyLanguage();
-  updateUserUI();
+// Context actions — all execute on DB via API
+document.getElementById("ctxOpen").onclick=()=>{
+  const item=sheets.find(x=>x.id===ctxTargetId);
+  if(item) window.open(item.url,'_blank');
+  hideCtx();
 };
 
-/* ═══════════════════════════════
-   HELPERS
-═══════════════════════════════ */
-function normalize(str) {
-  return String(str || "").toLowerCase().replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي');
-}
+document.getElementById("ctxFav").onclick=async()=>{
+  if(!ctxTargetId) return;
+  await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"toggleFavorite",user:currentUser?.email||"unknown",id:ctxTargetId})});
+  hideCtx(); loadData();
+};
 
-function escapeHTML(str) {
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
-}
+document.getElementById("ctxEdit").onclick=()=>{
+  editSheet(ctxTargetId); hideCtx();
+};
 
-/* ═══════════════════════════════
-   RENDER CATEGORIES (sidebar)
-═══════════════════════════════ */
-function renderCategories() {
-  const nav = document.getElementById("navContainer");
-  let html = `
-    <button class="nav-btn ${filter === 'all' ? 'active' : ''}" onclick="setFilter('all',this)">
-      <span>🏠</span><b>${lang === "ar" ? "الكل" : "All"}</b>
-    </button>
-  `;
-
-  categories.forEach(cat => {
-    html += `
-      <button class="nav-btn ${filter === cat.id ? 'active' : ''}" onclick="setFilter('${cat.id}',this)">
-        <span>${cat.icon}</span>
-        <b>${lang === "ar" ? cat.nameAr : cat.nameEn}</b>
-      </button>
-    `;
-  });
-
-  html += `
-    <button class="nav-btn ${filter === 'favorites' ? 'active' : ''}" onclick="setFilter('favorites',this)">
-      <span>⭐</span><b>${lang === "ar" ? "المفضلة" : "Favorites"}</b>
-    </button>
-  `;
-
-  if (currentUser?.role === "admin") {
-    html += `
-      <div class="nav-divider"></div>
-      <button class="nav-btn admin-only" onclick="openCategoryModal()">
-        <span>➕</span><b>${lang === "ar" ? "إضافة قسم" : "Add Category"}</b>
-      </button>
-    `;
-  }
-
-  nav.innerHTML = html;
-  document.getElementById("categoriesCount").innerText = categories.length;
-
-  const select = document.getElementById("categoryInput");
-  if (select) {
-    select.innerHTML = categories.map(cat =>
-      `<option value="${cat.id}">${cat.icon} ${lang === "ar" ? cat.nameAr : cat.nameEn}</option>`
-    ).join("");
-  }
-}
-
-/* ═══════════════════════════════
-   RENDER (button list)
-═══════════════════════════════ */
-function render() {
-  let data = [...sheets];
-
-  // Filter
-  if (filter !== "all") {
-    if (filter === "favorites") {
-      data = data.filter(x => x.favorite);
-    } else {
-      data = data.filter(x => x.category === filter);
-    }
-  }
-
-  // Search
-  const search = normalize(document.getElementById("searchInput").value);
-  if (search) {
-    data = data.filter(item =>
-      normalize(item.name).includes(search) ||
-      normalize(item.description).includes(search)
-    );
-  }
-
-  // Stats
-  document.getElementById("totalSheets").innerText = sheets.length;
-  document.getElementById("favoritesCount").innerText = sheets.filter(x => x.favorite).length;
-
-  // Section title
-  const sTitle = document.getElementById("sectionTitle");
-  if (filter === "all") {
-    sTitle.textContent = lang === "ar" ? "جميع الملفات" : "All Sheets";
-  } else if (filter === "favorites") {
-    sTitle.textContent = lang === "ar" ? "المفضلة" : "Favorites";
-  } else {
-    const cat = categories.find(c => c.id === filter);
-    sTitle.textContent = cat ? (lang === "ar" ? cat.nameAr : cat.nameEn) : filter;
-  }
-
-  // Modal title
-  document.getElementById("modalTitle").textContent = editingId
-    ? (lang === "ar" ? "تعديل" : "Edit Sheet")
-    : (lang === "ar" ? "إضافة ملف" : "Add Sheet");
-
-  const grid = document.getElementById("grid");
-
-  if (!data.length) {
-    grid.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📂</div>
-        <h3>${lang === "ar" ? "لا توجد بيانات" : "No sheets found"}</h3>
-        <p style="color:var(--muted);font-size:13px;margin-top:6px;">
-          ${lang === "ar" ? "أضف ملف جديد للبدء" : "Add a new sheet to get started"}
-        </p>
-      </div>
-    `;
+document.getElementById("ctxCopy").onclick=()=>{
+  const item=sheets.find(x=>x.id===ctxTargetId);
+  if(item){
+    navigator.clipboard.writeText(item.url).then(()=>{
+      // brief visual feedback
+      const el=document.getElementById("ctxCopyTxt");
+      el.textContent=lang==="ar"?"✓ تم النسخ":"✓ Copied!";
+      setTimeout(hideCtx,600);
+    }).catch(()=>hideCtx());
     return;
   }
-
-  // Get category label
-  function getCatLabel(catId) {
-    const cat = categories.find(c => c.id === catId);
-    if (!cat) return catId;
-    return lang === "ar" ? cat.nameAr : cat.nameEn;
-  }
-
-  grid.innerHTML = data.map((item, i) => `
-    <div class="sheet-row" style="animation-delay:${i * 30}ms">
-      <div class="row-icon">${item.icon || "📄"}</div>
-      <div class="row-info">
-        <div class="row-name">${escapeHTML(item.name)}</div>
-        <div class="row-desc">${escapeHTML(item.description || "")}</div>
-      </div>
-      <div class="row-cat">${getCatLabel(item.category)}</div>
-      <div class="row-actions">
-        <button class="row-action-btn fav-btn ${item.favorite ? 'active' : ''}"
-                onclick="event.stopPropagation();toggleFavorite('${item.id}')"
-                title="${lang === 'ar' ? 'مفضلة' : 'Favorite'}">⭐</button>
-        <button class="row-action-btn"
-                onclick="event.stopPropagation();editSheet('${item.id}')"
-                title="${lang === 'ar' ? 'تعديل' : 'Edit'}">✏️</button>
-        ${currentUser?.role === "admin" ? `
-          <button class="row-action-btn del-btn"
-                  onclick="event.stopPropagation();deleteSheet('${item.id}')"
-                  title="${lang === 'ar' ? 'حذف' : 'Delete'}">🗑️</button>
-        ` : ""}
-        <button class="row-action-btn open-btn-action"
-                onclick="event.stopPropagation();window.open('${item.url}','_blank')">
-          ${lang === "ar" ? "فتح ❯" : "Open ❯"}
-        </button>
-      </div>
-    </div>
-  `).join("");
-}
-
-/* Search listener */
-document.getElementById("searchInput").addEventListener("input", render);
-
-/* ═══════════════════════════════
-   FILTER
-═══════════════════════════════ */
-window.setFilter = (cat, el) => {
-  filter = cat;
-  document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
-  if (el) el.classList.add("active");
-  render();
+  hideCtx();
 };
 
-/* ═══════════════════════════════
-   SIDEBAR TOGGLE (mobile)
-═══════════════════════════════ */
-window.toggleSidebar = () => {
-  document.getElementById("sidebar").classList.toggle("show");
+document.getElementById("ctxDel").onclick=async()=>{
+  if(!ctxTargetId) return;
+  const ok=confirm(lang==="ar"?"هل تريد حذف هذا الملف؟":"Delete this sheet?");
+  if(!ok){hideCtx();return}
+  await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"deleteSheet",user:currentUser?.email||"unknown",id:ctxTargetId})});
+  hideCtx(); loadData();
 };
 
-/* ═══════════════════════════════
-   MODALS
-═══════════════════════════════ */
-window.openModal = () => {
-  if (!currentUser) {
-    alert(lang === "ar" ? "يجب تسجيل الدخول" : "Login Required");
-    return;
-  }
+function hideCtx(){document.getElementById("ctxMenu").classList.remove("show");ctxTargetId=null}
+
+document.addEventListener("click",()=>hideCtx());
+document.addEventListener("contextmenu",e=>{if(!e.target.closest('.pos-btn')) hideCtx()});
+
+/* ══════ FILTER ══════ */
+window.setFilter=(cat,el)=>{filter=cat;document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));if(el) el.classList.add("active");render()};
+window.toggleSidebar=()=>{document.getElementById("sidebar").classList.toggle("show")};
+
+/* ══════ MODALS ══════ */
+window.openModal=()=>{
+  if(!currentUser||currentUser.role!=="admin"){alert(lang==="ar"?"غير مصرح":"Not Allowed");return}
   document.getElementById("modal").classList.add("show");
 };
+window.closeModal=()=>{document.getElementById("modal").classList.remove("show");editingId=null;["nameInput","urlInput","descInput","iconInput"].forEach(id=>document.getElementById(id).value="")};
+window.openCategoryModal=()=>{if(currentUser?.role!=="admin"){alert(lang==="ar"?"غير مصرح":"Not Allowed");return}document.getElementById("categoryModal").classList.add("show")};
+window.closeCategoryModal=()=>{document.getElementById("categoryModal").classList.remove("show");["categoryNameEnInput","categoryNameArInput","categoryIconInput"].forEach(id=>document.getElementById(id).value="")};
 
-window.closeModal = () => {
-  document.getElementById("modal").classList.remove("show");
-  editingId = null;
-  document.getElementById("nameInput").value = "";
-  document.getElementById("urlInput").value = "";
-  document.getElementById("descInput").value = "";
-  document.getElementById("iconInput").value = "";
+/* ══════ SAVE SHEET (DB) ══════ */
+window.saveSheet=async()=>{
+  const name=document.getElementById("nameInput").value.trim();
+  let url=document.getElementById("urlInput").value.trim();
+  const desc=document.getElementById("descInput").value.trim();
+  const cat=document.getElementById("categoryInput").value;
+  const icon=document.getElementById("iconInput").value.trim();
+  if(!name||!url){alert(lang==="ar"?"أكمل البيانات":"Complete fields");return}
+  if(!/^https?:\/\//i.test(url)) url="https://"+url;
+  await fetch(API_URL,{method:"POST",body:JSON.stringify({
+    action:editingId?"updateSheet":"addSheet",
+    user:currentUser?.email||"unknown",
+    id:editingId||crypto.randomUUID(),
+    name,description:desc,url,category:cat,icon
+  })});
+  closeModal();loadData();
 };
 
-window.openCategoryModal = () => {
-  if (currentUser?.role !== "admin") {
-    alert(lang === "ar" ? "غير مصرح" : "Not Allowed");
-    return;
-  }
-  document.getElementById("categoryModal").classList.add("show");
-};
-
-window.closeCategoryModal = () => {
-  document.getElementById("categoryModal").classList.remove("show");
-  document.getElementById("categoryNameEnInput").value = "";
-  document.getElementById("categoryNameArInput").value = "";
-  document.getElementById("categoryIconInput").value = "";
-};
-
-/* ═══════════════════════════════
-   SAVE SHEET
-═══════════════════════════════ */
-window.saveSheet = async () => {
-  const name = document.getElementById("nameInput").value.trim();
-  let url = document.getElementById("urlInput").value.trim();
-  const description = document.getElementById("descInput").value.trim();
-  const category = document.getElementById("categoryInput").value;
-  const icon = document.getElementById("iconInput").value.trim();
-
-  if (!name || !url) {
-    alert(lang === "ar" ? "أكمل البيانات" : "Complete fields");
-    return;
-  }
-  if (!/^https?:\/\//i.test(url)) url = "https://" + url;
-
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: editingId ? "updateSheet" : "addSheet",
-      user: currentUser?.email || "unknown",
-      id: editingId || crypto.randomUUID(),
-      name, description, url, category, icon
-    })
-  });
-
-  closeModal();
-  loadData();
-};
-
-/* ═══════════════════════════════
-   DELETE
-═══════════════════════════════ */
-window.deleteSheet = async (id) => {
-  if (currentUser?.role !== "admin") {
-    alert(lang === "ar" ? "غير مصرح" : "Not Allowed");
-    return;
-  }
-  if (!confirm(lang === "ar" ? "هل تريد الحذف؟" : "Delete this sheet?")) return;
-
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "deleteSheet",
-      user: currentUser?.email || "unknown",
-      id
-    })
-  });
-  loadData();
-};
-
-/* ═══════════════════════════════
-   FAVORITE
-═══════════════════════════════ */
-window.toggleFavorite = async (id) => {
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "toggleFavorite",
-      user: currentUser?.email || "unknown",
-      id
-    })
-  });
-  loadData();
-};
-
-/* ═══════════════════════════════
-   EDIT
-═══════════════════════════════ */
-window.editSheet = (id) => {
-  const item = sheets.find(x => x.id === id);
-  if (!item) return;
-  editingId = id;
-  document.getElementById("nameInput").value = item.name;
-  document.getElementById("urlInput").value = item.url;
-  document.getElementById("descInput").value = item.description;
-  document.getElementById("categoryInput").value = item.category;
-  document.getElementById("iconInput").value = item.icon;
+/* ══════ EDIT (opens modal pre-filled) ══════ */
+window.editSheet=(id)=>{
+  const x=sheets.find(s=>s.id===id);if(!x) return;
+  editingId=id;
+  document.getElementById("nameInput").value=x.name;
+  document.getElementById("urlInput").value=x.url;
+  document.getElementById("descInput").value=x.description||"";
+  document.getElementById("categoryInput").value=x.category;
+  document.getElementById("iconInput").value=x.icon||"";
   openModal();
 };
 
-/* ═══════════════════════════════
-   SAVE CATEGORY
-═══════════════════════════════ */
-window.saveCategory = async () => {
-  if (currentUser?.role !== "admin") {
-    alert(lang === "ar" ? "غير مصرح" : "Not Allowed");
-    return;
-  }
-
-  const nameEn = document.getElementById("categoryNameEnInput").value.trim();
-  const nameAr = document.getElementById("categoryNameArInput").value.trim();
-  const icon = document.getElementById("categoryIconInput").value.trim() || "📂";
-
-  if (!nameEn) {
-    alert(lang === "ar" ? "أدخل اسم القسم" : "Enter category name");
-    return;
-  }
-
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "addCategory",
-      user: currentUser?.email || "unknown",
-      id: crypto.randomUUID(),
-      nameEn, nameAr, icon
-    })
-  });
-
-  closeCategoryModal();
+/* ══════ TOGGLE FAVORITE (DB) ══════ */
+window.toggleFavorite=async(id)=>{
+  await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"toggleFavorite",user:currentUser?.email||"unknown",id})});
   loadData();
 };
 
-/* ═══════════════════════════════
-   EXPORT
-═══════════════════════════════ */
-window.exportJSON = () => {
-  const data = JSON.stringify(sheets, null, 2);
-  const blob = new Blob([data], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "sheets-backup.json";
-  a.click();
+/* ══════ DELETE (DB) ══════ */
+window.deleteSheet=async(id)=>{
+  if(currentUser?.role!=="admin") return;
+  if(!confirm(lang==="ar"?"حذف؟":"Delete?")) return;
+  await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"deleteSheet",user:currentUser?.email||"unknown",id})});
+  loadData();
 };
 
-/* ═══════════════════════════════
-   CLOSE MODALS ON OVERLAY CLICK
-═══════════════════════════════ */
-window.onclick = e => {
-  if (e.target === document.getElementById("modal")) closeModal();
-  if (e.target === document.getElementById("categoryModal")) closeCategoryModal();
+/* ══════ SAVE CATEGORY (DB) ══════ */
+window.saveCategory=async()=>{
+  if(currentUser?.role!=="admin") return;
+  const en=document.getElementById("categoryNameEnInput").value.trim();
+  const ar=document.getElementById("categoryNameArInput").value.trim();
+  const ic=document.getElementById("categoryIconInput").value.trim()||"📂";
+  if(!en){alert(lang==="ar"?"أدخل الاسم":"Enter name");return}
+  await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"addCategory",user:currentUser?.email||"unknown",id:crypto.randomUUID(),nameEn:en,nameAr:ar,icon:ic})});
+  closeCategoryModal();loadData();
 };
 
+window.exportJSON=()=>{
+  const b=new Blob([JSON.stringify(sheets,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="backup.json";a.click();
+};
+
+window.onclick=e=>{
+  if(e.target===document.getElementById("modal")) closeModal();
+  if(e.target===document.getElementById("categoryModal")) closeCategoryModal();
+};
 </script>
 </body>
 </html>
